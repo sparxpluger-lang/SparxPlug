@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SparxPlug | AI Automation</title>
+    <style>
+        :root {
+            --orange: #f68026;
+            --bg: #0d0d0d;
+            --card: #1a1a1a;
+            --text: #ffffff;
+            --gray: #888888;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            border: 2px solid var(--orange);
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+        }
+
+        h1 span { color: var(--orange); }
+
+        .subtitle { color: var(--gray); margin-top: 5px; }
+
+        .card-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover { border-color: var(--orange); }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            background: var(--orange);
+            color: black;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:active { transform: scale(0.98); }
+
+        .footer {
+            margin-top: 50px;
+            color: #444;
+            font-size: 0.8rem;
+        }
+
+        /* Hidden text areas for copying */
+        .hidden-code { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="logo.png" alt="SparxPlug Logo">
+        <h1>Sparx<span>Plug</span></h1>
+        <p class="subtitle">AI Reading & Question Solver</p>
+    </div>
+
+    <div class="card-container">
+        <div class="card">
+            <h2>⚡ SparxPlug Script</h2>
+            <p>The main automation tool. Paste this into your mobile or desktop console to start solving questions instantly.</p>
+            <button class="copy-btn" onclick="copyCode('sparx-code')">Copy Main Script</button>
+            <div id="sparx-code" class="hidden-code">(function() { const MODEL = 'llama-3.3-70b-versatile'; const container = document.createElement('div'); container.id = "sparxplug-container"; container.style = "position: fixed; top: 100px; right: 10px; z-index: 10000; background: #121212; padding: 0; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); font-family: sans-serif; width: 180px; border: 1px solid #f68026; color: white; user-select: none; touch-action: none; overflow: hidden;"; const header = document.createElement('div'); header.style = "background: #f68026; color: black; padding: 10px; cursor: move; font-weight: 800; font-size: 14px; text-align: center; touch-action: none;"; header.innerHTML = `SparxPlug`; const body = document.createElement('div'); body.style = "padding: 10px; display: flex; flex-direction: column; gap: 8px;"; const keyInput = document.createElement('input'); keyInput.type = "password"; keyInput.placeholder = "Paste Groq Key Here"; keyInput.style = "background: #000; color: #f68026; border: 1px solid #333; padding: 6px; border-radius: 4px; font-size: 10px; outline: none;"; keyInput.value = localStorage.getItem('sparx_key') || ""; keyInput.onchange = () => localStorage.setItem('sparx_key', keyInput.value); const readBtn = document.createElement('button'); readBtn.innerText = "📖 Read"; readBtn.style = "cursor: pointer; background: #2a2a2a; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; font-size: 12px; transition: all 0.3s;"; const answerBtn = document.createElement('button'); answerBtn.innerText = "🤖 Answer"; answerBtn.style = "cursor: pointer; background: #f68026; color: black; border: none; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 12px;"; body.append(keyInput, readBtn, answerBtn); container.append(header, body); document.body.appendChild(container); let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0; function dragStart(e) { initialX = (e.type === "touchstart" ? e.touches[0].clientX : e.clientX) - xOffset; initialY = (e.type === "touchstart" ? e.touches[0].clientY : e.clientY) - yOffset; if (e.target === header) active = true; } function dragEnd() { initialX = currentX; initialY = currentY; active = false; } function drag(e) { if (!active) return; e.preventDefault(); currentX = (e.type === "touchmove" ? e.touches[0].clientX : e.clientX) - initialX; currentY = (e.type === "touchmove" ? e.touches[0].clientY : e.clientY) - initialY; xOffset = currentX; yOffset = currentY; container.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`; } header.addEventListener("touchstart", dragStart); window.addEventListener("touchend", dragEnd); window.addEventListener("touchmove", drag, { passive: false }); header.addEventListener("mousedown", dragStart); window.addEventListener("mouseup", dragEnd); window.addEventListener("mousemove", drag); let storyText = ""; readBtn.onclick = async () => { const content = document.querySelector('.read-content')?.innerText; if (content) { storyText = content.replace(/\s+/g, ' ').trim(); const originalText = "📖 Read"; readBtn.innerText = "✅ Content Read"; readBtn.style.background = "#1b4d2e"; readBtn.style.color = "#4ade80"; setTimeout(() => { readBtn.innerText = originalText; readBtn.style.background = "#2a2a2a"; readBtn.style.color = "white"; }, 3000); } else { alert("Could not find '.read-content' on this page."); } }; answerBtn.onclick = async () => { const API_KEY = keyInput.value; if (!API_KEY) return alert("Please enter your Groq API Key in the box!"); if (!storyText) return alert("Click 'Read' first!"); const question = document.querySelector('.sr_6690a5cb')?.innerText; const optionEls = document.querySelectorAll('.sr_ec0ba328 button .sr_9688e5d2'); const options = Array.from(optionEls).map(el => el.innerText.trim()); if (!question || options.length === 0) return alert("Question or options not detected."); answerBtn.innerText = "⌛ Thinking..."; try { const response = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` }, body: JSON.stringify({ model: MODEL, messages: [ { role: "system", content: "Identify the correct option. Respond ONLY with the exact text of that option." }, { role: "user", content: `Story: ${storyText}\n\nQ: ${question}\nOptions: ${options.join(' | ')}` } ], temperature: 0 }) }); const data = await response.json(); if (data.error) throw new Error(data.error.message); const aiAnswer = data.choices[0].message.content.trim().replace(/^["']|["']$/g, ''); let matched = false; document.querySelectorAll('.sr_ec0ba328 button').forEach(btn => { if (btn.innerText.toLowerCase().includes(aiAnswer.toLowerCase())) { btn.style.border = "4px solid #f68026"; btn.scrollIntoView({ behavior: 'smooth', block: 'center' }); matched = true; } }); if(!matched) alert("AI Suggests: " + aiAnswer); } catch (e) { alert("Error: " + e.message); } finally { answerBtn.innerText = "🤖 Answer"; } }; })();</div>
+        </div>
+
+        <div class="card">
+            <h2>📱 Inspect Opener</h2>
+            <p>For mobile users. Create a bookmark, name it "Inspect", and paste this as the URL to open the console.</p>
+            <button class="copy-btn" onclick="copyCode('inspect-code')">Copy Bookmarklet</button>
+            <div id="inspect-code" class="hidden-code">javascript:(function () { var script = document.createElement('script'); script.src="//cdn.jsdelivr.net/npm/eruda"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 SparxPlug AI Tools.
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const code = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = "✅ Copied!";
+                btn.style.background = "#4ade80";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = "#f68026";
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
