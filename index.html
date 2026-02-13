@@ -3,63 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SparxPlug Stealth Deployment</title>
+    <title>SparxPlug Deployment</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f0f0f;
-            color: #ffffff;
+            font-family: sans-serif;
+            background-color: #121212;
+            color: white;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
         }
-        .container {
-            background: #1a1a1a;
-            padding: 2rem;
+        .card {
+            background: #1e1e1e;
+            padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid #f68026;
-            max-width: 500px;
+            border: 2px solid #f68026;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 450px;
         }
-        h1 { color: #f68026; margin-bottom: 10px; }
-        p { color: #aaa; font-size: 0.9rem; line-height: 1.5; }
-        .code-box {
+        h1 { color: #f68026; margin-top: 0; }
+        .code-preview {
             background: #000;
             padding: 15px;
             border-radius: 8px;
-            margin: 20px 0;
-            font-family: monospace;
-            font-size: 0.8rem;
-            overflow-x: auto;
             text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+            height: 150px;
+            overflow-y: scroll;
+            margin: 20px 0;
             border: 1px solid #333;
-            max-height: 200px;
+            color: #00ff00;
         }
         button {
             background: #f68026;
-            color: #000;
+            color: black;
             border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 16px;
+            transition: 0.2s;
         }
-        button:hover { background: #ff9d4d; transform: scale(1.05); }
-        .footer { margin-top: 20px; font-size: 0.7rem; color: #555; }
+        button:hover {
+            background: #ff9d4d;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="card">
     <h1>SparxPlug Stealth</h1>
-    <p>Ultimate automation for Sparx Reader. Includes WPM control, Admin Instant mode, and Stealth features.</p>
+    <p>Copy the script below and paste it into your browser console (Inspect > Console).</p>
     
-    <div class="code-box" id="script-code">
-/* SparxPlug Stealth Loader */
+    <div class="code-preview" id="scriptBody">
 (function() {
     const MODEL = 'llama-3.3-70b-versatile'; 
     let currentWPM = localStorage.getItem('sparx_wpm') || 500;
@@ -67,6 +76,7 @@
     let autoInterval = null;
     let isReading = false;
 
+    // 1. UI Setup
     const container = document.createElement('div');
     container.id = "sparxplug-container";
     container.style = "position: fixed; top: 100px; right: 10px; z-index: 10000; background: #121212; padding: 0; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); font-family: sans-serif; width: 200px; border: 1px solid #f68026; color: white; user-select: none; touch-action: none; overflow: hidden;";
@@ -85,6 +95,7 @@
     keyInput.value = localStorage.getItem('sparx_key') || "";
     keyInput.onchange = () => localStorage.setItem('sparx_key', keyInput.value);
 
+    // ADMIN BUTTON
     const adminBtn = document.createElement('button');
     adminBtn.innerText = "⚡ ADMIN (INSTANT)";
     adminBtn.style = "cursor: pointer; background: #ff0000; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: 900; font-size: 12px; text-shadow: 0 0 5px black;";
@@ -118,6 +129,7 @@
     container.append(header, body);
     document.body.appendChild(container);
 
+    // Drag Logic
     let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
     function dragStart(e) { initialX = (e.type === "touchstart" ? e.touches[0].clientX : e.clientX) - xOffset; initialY = (e.type === "touchstart" ? e.touches[0].clientY : e.clientY) - yOffset; if (e.target === header) active = true; }
     function dragEnd() { initialX = currentX; initialY = currentY; active = false; }
@@ -133,6 +145,7 @@
         const sparxReadBtn = document.querySelector('button[data-test-id="read-button"]');
         if (content && sparxReadBtn && sparxReadBtn.getAttribute('aria-disabled') === 'false') {
             storyText = content.replace(/\s+/g, ' ').trim();
+            
             if (!isInstant) {
                 isReading = true;
                 const wordCount = storyText.split(/\s+/).length;
@@ -142,6 +155,7 @@
                 await new Promise(r => setTimeout(r, totalWait * 1000));
                 isReading = false;
             }
+
             sparxReadBtn.click();
             readBtn.innerText = "✅ Done";
             setTimeout(() => { readBtn.innerText = "📖 Read"; }, 2000);
@@ -152,7 +166,8 @@
 
     const doContinue = () => {
         const nextBtn = document.querySelector('button[data-test-id="next-continue-button"]');
-        const continueBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes("Continue"));
+        const buttons = document.querySelectorAll('button');
+        const continueBtn = Array.from(buttons).find(b => b.innerText.includes("Continue"));
         const target = nextBtn || continueBtn;
         if (target && target.getAttribute('aria-disabled') === 'false') { target.click(); return true; }
         return false;
@@ -161,9 +176,13 @@
     const doAnswer = async (isInstant = false) => {
         if (isReading && !isInstant) return;
         const API_KEY = keyInput.value;
+        if (!API_KEY || !storyText) return;
+
         const question = document.querySelector('.sr_6690a5cb')?.innerText;
         const optionEls = document.querySelectorAll('.sr_ec0ba328 button .sr_9688e5d2');
-        if (!API_KEY || !question || optionEls.length === 0) return;
+        const options = Array.from(optionEls).map(el => el.innerText.trim());
+
+        if (!question || options.length === 0) return;
 
         answerBtn.innerText = "⌛ Thinking...";
         try {
@@ -172,29 +191,41 @@
                 headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
                 body: JSON.stringify({
                     model: MODEL,
-                    messages: [{ role: "system", content: "Identify correct option. Exact text only." }, { role: "user", content: `Story: ${storyText}\n\nQ: ${question}\nOptions: ${Array.from(optionEls).map(e=>e.innerText).join(' | ')}` }],
+                    messages: [
+                        { role: "system", content: "Identify correct option. Exact text only." },
+                        { role: "user", content: `Story: ${storyText}\n\nQ: ${question}\nOptions: ${options.join(' | ')}` }
+                    ],
                     temperature: 0
                 })
             });
+
             const data = await response.json();
+            if (!data.choices) throw new Error("API Limit or Error");
+
             const aiAnswer = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+            
             document.querySelectorAll('.sr_ec0ba328 button').forEach(btn => {
                 if (btn.innerText.toLowerCase().includes(aiAnswer.toLowerCase())) {
                     btn.style.border = "4px solid #f68026";
                     btn.click();
-                    if (autoMode || isInstant) setTimeout(doContinue, isInstant ? 100 : 1500);
+                    if (autoMode || isInstant) {
+                        setTimeout(doContinue, isInstant ? 100 : 1500);
+                    }
                 }
             });
-        } catch (e) { answerBtn.innerText = "❌ Error"; }
+        } catch (e) { console.error(e); answerBtn.innerText = "❌ Error"; }
         finally { if (!answerBtn.innerText.includes("❌")) answerBtn.innerText = "🤖 Answer"; }
     };
 
+    // ADMIN CLICK LOGIC
     adminBtn.onclick = async () => {
         adminBtn.innerText = "⚡ RUNNING...";
+        adminBtn.style.background = "#ffae00";
         await doRead(true);
         await new Promise(r => setTimeout(r, 200));
         await doAnswer(true);
         adminBtn.innerText = "⚡ ADMIN (INSTANT)";
+        adminBtn.style.background = "#ff0000";
     };
 
     readBtn.onclick = () => doRead(false);
@@ -202,9 +233,10 @@
 
     autoBtn.onclick = () => {
         autoMode = !autoMode;
-        autoBtn.innerText = autoMode ? "🚀 Auto: ON" : "🚀 Auto: OFF";
-        autoBtn.style.background = autoMode ? "#f68026" : "#333";
         if (autoMode) {
+            autoBtn.innerText = "🚀 Auto: ON";
+            autoBtn.style.background = "#f68026";
+            autoBtn.style.color = "black";
             autoInterval = setInterval(async () => {
                 if (!isReading) {
                     await doRead(false);
@@ -212,20 +244,28 @@
                     if (document.querySelector('.sr_6690a5cb')) await doAnswer(false);
                 }
             }, 3000); 
-        } else { clearInterval(autoInterval); }
+        } else {
+            autoBtn.innerText = "🚀 Auto: OFF";
+            autoBtn.style.background = "#333";
+            autoBtn.style.color = "white";
+            clearInterval(autoInterval);
+        }
     };
 })();
     </div>
 
-    <button onclick="copyScript()">Copy to Clipboard</button>
-    <div class="footer">For educational use only. Keep WPM realistic to avoid detection.</div>
+    <button onclick="copyToClipboard()">Copy Script</button>
+    <div id="status" class="status"></div>
 </div>
 
 <script>
-    function copyScript() {
-        const text = document.getElementById('script-code').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Script copied! Paste it into your browser console on Sparx Reader.');
+    function copyToClipboard() {
+        const script = document.getElementById('scriptBody').innerText;
+        navigator.clipboard.writeText(script).then(() => {
+            const status = document.getElementById('status');
+            status.innerText = "Copied! Paste into Console (F12)";
+            status.style.color = "#00ff00";
+            setTimeout(() => { status.innerText = ""; }, 3000);
         });
     }
 </script>
